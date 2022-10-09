@@ -15,7 +15,7 @@ void setup() {
 // setting up Serial Comms
 Serial.begin(9600);
 Serial.setTimeout(10);
-
+// intilializaing IMU
 Wire.begin();
 Wire.beginTransmission(0x68);
 Wire.write(0x6B);
@@ -33,17 +33,7 @@ setpoint = 0;
 
 // Main Loop
 void loop() {
-  /*
-  timePrev = time;
-  time = millis();
-  deltaTime = (time - timePrev) / 1000;
-*/
-  followAngle(serialAngle2(), accelRead());
-  //angle = gyroRead() + 90;
-  //myservo.write(angle);
-  
-  //Serial.print("Input angle: ");
-  //Serial.println(serialReadout());
+  followAngle(serialAngle(), accelRead());
 }
 
 // Functions
@@ -54,28 +44,10 @@ void followAngle(int setpoint, float IMUInput){
   Serial.println(angle - 90);
 }
 
-int serialReadout(){
-  if(Serial.available()>0){}
-  data = Serial.parseInt();
-  return data;
-  //Serial.print("Input angle: ");
-  //Serial.println(Str, DEC);
-}
-int serialAngle2(){
-  if(Serial.available()==0){}
-  else{
-    String data = Serial.readString();
-    int setpoint = data.toFloat();
-    //myservo.write(setpoint);
-    return setpoint;
-    Serial.println("Input angle: ");
-    Serial.print(setpoint);
-  }
-}
 int serialAngle(){
   if(Serial.available()==0){}
   else{
-    String data = Serial.readStringUntil("/n");
+    String data = Serial.readString();
     int setpoint = data.toFloat();
     //myservo.write(setpoint);
     return setpoint;
@@ -101,6 +73,10 @@ float accelRead(){
 }
 
 float gyroRead(){
+  timePrev = time;
+  time = millis();
+  deltaTime = (time - timePrev) / 1000;
+
   Wire.beginTransmission(0x68);
   Wire.write(0x43);
   Wire.endTransmission(false);
